@@ -3,14 +3,19 @@
 import sys
 import os
 from subprocess import call
+import platform
 
 def execute(str):
 	print str
 	call(str.split())
 
 install_path = "/usr/local"
-x11_include_path = "/opt/X11/include"
-x11_lib_path = "/opt/X11/lib"
+x11_include_path = ""
+x11_lib_path = ""
+
+if platform.system() == "Darwin":
+	x11_include_path = "-I/opt/X11/include"
+	x11_lib_path = "-L/opt/X11/lib"
 
 if len(sys.argv) == 2:
 	if (sys.argv[1] == "help"):
@@ -36,7 +41,8 @@ execute("mkdir build")
 os.chdir("build")
 
 execute("cp -R ../dlib .")
-execute("g++ -O3 -c -I" + x11_include_path + " ./dlib/all/source.cpp -o source.o")
+execute("g++ -O3 -c " + x11_include_path + " ./dlib/all/source.cpp -o source.o -DDLIB_JPEG_SUPPORT")
 execute("ar cr libdlib.a source.o")
+
 execute("cp -R dlib " + install_path + "/include")
 execute("cp libdlib.a " + install_path + "/lib")
